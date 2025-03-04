@@ -1,13 +1,14 @@
-import {firstValueFrom, Observable} from 'rxjs'
+import {Observable} from 'rxjs'
 import {type DocumentStore} from 'sanity'
 import homeSettings from '../schemaTypes/homeSettings'
 
 /**
  * Fetches the homepage ID by resolving the observable.
  */
-export async function getHomepageId(documentStore: DocumentStore) {
-  return firstValueFrom(
-    listenToQuery<string>(documentStore, `*[_id == "${homeSettings.name}"][0].homepage._ref`),
+export function getHomepageObservable(documentStore: DocumentStore): Observable<string | null> {
+  return listenToQuery<string | null>(
+    documentStore,
+    `*[_id == "${homeSettings.name}"][0].homepage._ref`,
   )
 }
 
