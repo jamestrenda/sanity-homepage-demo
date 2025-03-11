@@ -23,19 +23,4 @@ export default defineType({
       },
     }),
   ],
-  preview: {
-    select: {
-      title: 'title',
-      slug: 'slug',
-    },
-    prepare: ({title, slug = {current: ''}}) => {
-      const path = `/${slug.current}`
-
-      return {
-        title: `${title || 'Untitled'}`,
-        subtitle: slug.current ? path : '(missing slug)',
-        media: FileIcon,
-      }
-    },
-  },
 })
