@@ -13,10 +13,24 @@ export default defineConfig({
   plugins: [
     structureTool({
       structure,
+      // singleton approach...
+      // structure: (S) => {
+      //   return S.list()
+      //     .title('Content')
+      //     .items([
+      //       S.listItem()
+      //         .title('Home')
+      //         .child(
+      //           S.defaultDocument({
+      //             schemaType: 'home',
+      //             documentId: 'home',
+      //           }),
+      //         ),
+      //     ])
+      // },
     }),
     visionTool(),
   ],
-
   schema: {
     types: schemaTypes,
   },
