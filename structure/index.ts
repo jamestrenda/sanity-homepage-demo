@@ -19,29 +19,27 @@ export const structure: StructureResolver = async (S, context) => {
 
   const getHomepage = () =>
     getHomepageObservable(context.documentStore).pipe(
-      map((id) => {
-        if (!id) return homeSettings // if no homepage has been set, show the home settings singleton
-        return S.document() // otherwise, show the actual homepage
-          .schemaType('page')
-          .documentId(id)
-      }),
+      map(
+        (id) =>
+          id
+            ? S.document().schemaType('page').documentId(id) // Show the actual homepage
+            : homeSettings, // Show home settings if no homepage is set
+      ),
     )
 
   const home = S.listItem().title('Home').icon(HomeIcon).child(getHomepage)
 
   const getFilteredPages = () =>
     getHomepageObservable(context.documentStore).pipe(
-      map((id) => {
-        return S.documentTypeList('page')
+      map((id) =>
+        S.documentTypeList('page')
           .filter(
             `_type == "page" && ($id == null || _id != $id && !(_id in path("drafts." + $id)))`,
           )
-          .params({
-            id,
-          })
+          .params({id})
           .apiVersion('v2025-03-03')
-          .title('Pages')
-      }),
+          .title('Pages'),
+      ),
     )
 
   const pages = S.listItem().title('Pages').icon(PageIcon).child(getFilteredPages)
@@ -51,8 +49,15 @@ export const structure: StructureResolver = async (S, context) => {
     .icon(SettingsIcon)
     .child(S.list().title('Settings').items([homeSettingsListItem]))
 
-  return S.list()
-    .id('root')
-    .title('Content')
-    .items([home, S.divider(), pages, S.divider(), settings])
+  return getHomepageObservable(context.documentStore).pipe(
+    map((homepageId) => {
+      const items = [pages, S.divider(), settings]
+
+      if (homepageId) {
+        items.unshift(home, S.divider())
+      }
+
+      return S.list().id('root').title('Content').items(items)
+    }),
+  )
 }
